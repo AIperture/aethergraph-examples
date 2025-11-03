@@ -1,0 +1,73 @@
+# ----------------------------
+# 📦 Python + Conda + Virtualenv
+# ----------------------------
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Test and temp cache
+*.log
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+*.DS_Store
+.idea/
+.vscode/
+.env
+.venv
+.env.*
+*.env
+/test
+# Pytest cache
+.cache/
+.pytest_cache/
+
+# Output files
+*.png
+*.pdf
+*.svg
+debug_outputs/
+/storage/
+output/
+*.sqlite3
+*.db
+*.json
+*.jsonl
+
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# MyPy, Coverage, and Profiling reports
+.mypy_cache/
+.coverage
+htmlcov/
+coverage.xml
+*.prof
+
+# Dist and packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+*.whl
+
+# VS Code project-level settings
+.vscode/
+
+# Virtual environment
+venv/
+ENV/
+env/
+
+# Aethergraph specific
+aeg_workspace/
+aethergraph_data/
+
+# all sqlite db files and faiss indexes
+*.sqlite3
+*.db
+*.faiss
