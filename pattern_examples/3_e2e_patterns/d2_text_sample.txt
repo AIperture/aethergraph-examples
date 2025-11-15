@@ -1,0 +1,19 @@
+Title: Simple Linear Trend Simulation
+
+Method
+We simulate a one-dimensional signal that follows a simple linear trend over time.
+
+First, we create a sequence of evenly spaced time steps.
+At each time step t, the signal value y is defined by a linear function:
+
+    y = 0.5 * t + 1.0
+
+We generate approximately 100 sample points, starting from t = 0
+and increasing by a fixed step of 1 until we reach the final time index.
+
+The resulting values are then visualized as a line plot, with:
+- the horizontal axis representing the time index, and
+- the vertical axis representing the simulated signal amplitude.
+
+No noise or randomness is added in this basic version.
+This setup is intended purely as a toy example of a simple linear method.
