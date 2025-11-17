@@ -6,18 +6,45 @@
 
 
 """
-Agentic Flow: Chat Agent with Persistent Memory
+This script demonstrates a chat agent with persistent memory that remembers conversations across sessions:
 
-This script demonstrates an agentic flow using AetherGraph where a chat agent interacts with a user, 
-remembers previous conversations, and summarizes the session at the end. The flow consists of:
+What it does:
 
-1. Seeding the agent's memory with example chat turns to simulate prior context.
-2. Loading previous chat history from memory at startup, so the agent can reference past discussions.
-3. Running a chat loop where user and assistant turns are recorded in both memory and a local buffer.
-4. Using the combined history (seeded + live) to provide context-aware responses.
-5. Summarizing the conversation at session end and saving both the chat log and summary as an artifact.
+Seeds memory with fake chat history (seed_chat_memory_demo):
+    Records 2 example chat turns to memory:
+        User: "We talked about integrating AetherGraph..."
+        Assistant: "I suggested starting with a simple graph_fn..."
+    Tagged with kind="chat_turn" for easy retrieval
+    Simulates prior conversation context
 
-This enables the agent to maintain continuity across sessions and provide informed, context-rich interactions.
+Chat agent with memory loading (chat_agent_with_memory):
+    Startup phase:
+        Loads up to 50 previous chat turns from memory using mem.recent_data()
+        Injects loaded history into conversation buffer
+        Tells user: "🧠 I loaded X previous chat turns into context"
+    Chat loop:
+        User types messages (channel input)
+        Each turn (user + assistant) recorded to:
+            Memory (mem.record()) - persistent storage
+            Local buffer (conversation) - current session
+        LLM gets last 10 turns as context (including loaded history)
+        Agent can reference past conversations: "what have we talked about?"
+        Type 'quit'/'exit' to end
+
+Wrap-up:
+    Summarizes entire conversation using LLM
+    Saves conversation + summary as JSON artifact
+    Shows summary to user
+
+Key features:
+    Persistent memory: Conversations survive across runs (same run_id)
+    Automatic history loading: Past context injected at startup
+    Dual logging: Both memory (persistent) and local buffer (session)
+    Context-aware responses: LLM sees both old and new messages
+    Session summary: AI-generated summary at end
+    Artifact storage: Full conversation saved for later analysis
+
+This pattern enables stateful chatbots that maintain continuity across sessions, remember user preferences, and provide coherent long-term interactions.
 """
 
 

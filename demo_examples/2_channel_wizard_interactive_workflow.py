@@ -1,25 +1,49 @@
 # Prerequisite: None
 
 """
-This script implements an interactive experiment configuration wizard that:
+This script implements an interactive experiment configuration wizard using AetherGraph's channel-based communication system. Here's what it does:
 
-Collects user inputs through a 3-step conversational flow:
+Overview
+The wizard guides users through configuring an experiment by asking questions interactively and saves the final configuration as an artifact.
 
-Step 1: Project name and number of steps (with validation)
-Step 2: Optional advanced settings (learning rate, debug logging)
-Step 3: Confirmation with options to confirm, restart, or cancel
-Validates all inputs (non-empty strings, positive integers/floats)
+Step-by-Step Flow
+    Step 1: Basic Configuration
+        Asks for a project name (validates it's not empty)
+        Asks for number of steps (validates it's a positive integer)
+    Step 2: Advanced Options
+        Asks whether to enable advanced mode (Yes/No)
+        If advanced mode is enabled:
+            Asks for a learning rate (validates it's a positive float)
+            Asks whether to enable debug logging (Yes/No)
+    Step 3: Review & Confirmation
+        Displays the collected configuration in a formatted JSON preview
+        Asks for confirmation with three options:
+            Confirm → Saves the configuration and completes the wizard
+            Restart → Goes back to Step 1 and starts over
+            Cancel → Exits without saving anything
 
-Saves the configuration as both a local JSON file and a persistent artifact with searchable metadata
+Finalization
+If confirmed:
+    Saves the configuration to a local run_config.json file
+    Stores it as an artifact in AetherGraph's artifact system with:
+        Kind: "run_config"
+        Labels: project name and advanced mode status
+        Suggested URI path for organization
+    Returns the configuration and artifact URI
 
-Demonstrates AetherGraph's channel API:
+Key Interactive Methods Demonstrated
+    channel().send_text() - Send messages to the user
+    channel().ask_text() - Get text input from the user
+    channel().ask_approval() - Present multiple-choice buttons to the user
 
-send_text() - Display messages
-ask_text() - Get user input
-ask_approval() - Present multiple-choice buttons
-The wizard allows users to restart from the beginning or cancel at any point, making it a complete
-example of building interactive, conversational workflows with validation and state persistence.
+Key Features
+    Input validation loops (non-empty strings, positive integers/floats)
+    Conditional branching (advanced mode)
+    Multi-option approval buttons with restart capability
+    Artifact persistence with metadata (kind, labels, suggested URI)
+    Channel-agnostic - Works with any channel adapter (console, web UI, Slack, etc.)
 
+This is a canonical example of building conversational, user-driven workflows with validation, branching logic, and persistent storage - a pattern that scales to complex configuration wizards, onboarding flows, and interactive data collection.
 """
 
 from __future__ import annotations
