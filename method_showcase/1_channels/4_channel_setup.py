@@ -1,3 +1,27 @@
+# Prerequisite: interactive channel setup (e.g., Slack or Telegram)
+# See: https://aiperture.github.io/aethergraph-docs/channel-setup/introduction/ for channel setup instructions.
+#
+# Make sure to set the following environment variables for the channels to work:
+# For Slack:
+#   AETHERGRAPH_SLACK__ENABLED=true # If not set, Slack channel will be disabled
+#   AETHERGRAPH_SLACK__BOT_TOKEN=your-slack-bot-token
+#   AETHERGRAPH_SLACK__APP_TOKEN=your-slack-app-level-token
+#   AETHERGRAPH_SLACK__SIGNING_SECRET=your-slack-signing-secret
+#
+# For Telegram:
+#   AETHERGRAPH_TELEGRAM__ENABLED=true # If not set, Telegram channel will be disabled
+#   AETHERGRAPH_TELEGRAM__BOT_TOKEN=your-telegram-bot-token
+#
+# No other special env vars needed for webhook or file channels
+#
+# Channel key formats:
+#   Console: console:stdin (default)
+#   Slack:   slack:team/{TEAM_ID}:chan/{CHANNEL_ID}
+#   Telegram: tg:chat/{CHAT_ID}
+#   Webhook: webhook:url/{WEBHOOK_URL}
+#   File:    file:{FILE_PATH}
+
+
 from aethergraph import graph_fn, NodeContext
 from aethergraph import start_server
 from aethergraph.runtime import (
@@ -5,19 +29,6 @@ from aethergraph.runtime import (
     set_channel_alias,
 )
 import os 
-
-# NOTE: Make sure to set the following environment variables for the channels to work:
-# For Slack:
-#   AETHERGRAPH_SLACK__ENABLED=true # If not set, Slack channel will be disabled
-#   AETHERGRAPH_SLACK__BOT_TOKEN=your-slack-bot-token
-#   AETHERGRAPH_SLACK__APP_TOKEN=your-slack-app-level-token
-#   AETHERGRAPH_SLACK__SIGNING_SECRET=your-slack-signing-secret
-
-# For Telegram:
-#   AETHERGRAPH_TELEGRAM__ENABLED=true # If not set, Telegram channel will be disabled
-#   AETHERGRAPH_TELEGRAM__BOT_TOKEN=your-telegram-bot-token
-
-# No other special env vars needed for webhook or file channels
 
 # example graph_fn
 @graph_fn(name="test_channel_service")

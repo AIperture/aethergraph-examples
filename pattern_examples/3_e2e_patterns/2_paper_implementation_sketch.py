@@ -1,19 +1,57 @@
-# demo_paper_to_code_run.py
-#
-# D.1 Paper → Code → Run → Image (minimal, stubbed)
-#
-# Flow:
-#   1) Ask user to upload a text file (method description from a paper).
-#   2) Extract method text and (stub) “parse” parameters.
-#   3) Generate Python code based on those parameters and save it via artifacts.
-#   4) Run the generated Python script (locally).
-#   5) The script writes a result image (e.g., simple plot) to disk.
-#   6) Load the image bytes and send back to the channel via send_file,
-#      plus a short text summary via send_text.
-#
-# NOTE: This is a demo flow; parsing and code generation are stubs.
-#       Running arbitrary code is dangerous – for real use, you’d want
-#       proper sandboxing.
+
+"""
+
+Explain what this does
+
+This script demonstrates an end-to-end "paper-to-code-to-execution" workflow that automates implementing and running experiments described in research papers:
+
+What it does:
+
+Upload method description (ask_files):
+    User uploads a text/markdown file via Slack containing a method section from a paper    
+    Graph suspends until file is uploaded
+
+Extract method text (extract_method_text):
+    Reads the uploaded file from artifact storage
+    Loads the full text content
+
+Parse parameters (extract_params) - STUB:
+    In real version: would use LLM to extract experimental parameters (learning rate, iterations, etc.)
+    Current stub: counts words and sets dummy params (slope=0.5, intercept=1.0, num_points based on text length)
+
+Generate Python code (generate_and_save_code):
+    Creates a matplotlib script that plots y = slope * x + intercept
+    Saves the generated script to artifacts for traceability
+    Returns both artifact URI and local file path
+
+Execute the generated code (run_generated_code):
+    Runs the Python script in a subprocess (⚠️ security warning: dangerous in production)
+    Script generates result.png plot
+    Captures stdout and return code
+
+Send results back (send_result_image_and_summary):
+    Loads the generated result.png image
+    Sends image file via Slack using send_file()
+    Sends text summary with source file, script path, exit code, and stdout preview
+
+Key concepts:
+    Automated research reproduction: From paper text → executable code → results
+    Multi-stage workflow: Upload → Parse → Generate → Execute → Visualize
+    Artifact tracking: Generated code saved for reproducibility
+    Interactive results: Images and summaries sent back via Slack
+    File handling: Both upload (ask_files) and send (send_file) capabilities
+
+Real-world extensions (mentioned but stubbed):
+    Use LLM to intelligently parse method descriptions
+    Extract complex experimental parameters
+    Generate domain-specific code (ML training, simulations, etc.)
+    Sandbox execution for security
+    Handle multiple plots/tables/outputs
+
+This pattern is powerful for automated scientific workflows, reproducible research, and rapid prototyping from natural language descriptions.
+
+NOTE: for testing, you can upload `d2_text_sample.txt` under the same directory as this script via Slack.
+"""
 
 from __future__ import annotations
 

@@ -1,35 +1,38 @@
-# ---------------------------------------------------------
-# Example: Optimization Loop with Artifacts & Memory
-# ---------------------------------------------------------
-#
-# GOAL
-# ----
-# Show a small optimization loop (gradient descent on a toy function) that:
-#   - logs metrics over time,
-#   - saves checkpoints & metrics as artifacts,
-#   - uses another agent to summarize the run with an LLM.
-#
-# WHAT THIS EXAMPLE SHOWS
-# -----------------------
-# 1. Long-running loop structured in a @graph_fn.
-# 2. Using context.artifacts() to:
-#      - save checkpoints during training,
-#      - save a final metrics file,
-#      - save an LLM-generated summary.
-# 3. Using context.memory() to log per-step metrics.
-# 4. Using context.llm() to "look at the training curve" and describe trends. Extendable to other analyses (e.g., plotting). 
-#
-# SCENARIO
-# --------
-# - Objective: minimize f(x, y) = (x - 3)^2 + (y + 1)^2.
-# - Start from (x, y) = (0, 0).
-# - Gradient descent with a fixed learning rate.
-#
-# In a real project this pattern scales to:
-#   - complex simulations or training loops,
-#   - multiple metrics and checkpoints,
-#   - post-hoc analysis agents that read artifacts and generate reports.
-# ---------------------------------------------------------
+# Prerequisite: Make sure you have LLM set up in your Aethergraph .env with the fields:
+# AETHERGRAPH_LLM__ENABLED=true
+# AETHERGRAPH_LLM__DEFAULT__PROVIDER=openai   # e.g., openai, anthropic, google, lmstudio, etc.
+# AETHERGRAPH_LLM__DEFAULT__MODEL=gpt-4o-mini # e.g., gpt-4o-mini, claude-2, gemini-2.5-flash-lite, qwen/qwen2.5-vl-7b, etc.
+# AETHERGRAPH_LLM__DEFAULT__API_KEY=          # your API key
+
+
+"""
+This script demonstrates a toy optimization loop with artifact tracking and LLM-based analysis:
+
+What it does:
+
+Runs gradient descent on a simple function f(x,y) = (x-3)² + (y+1)² for 30 steps starting from (0,0)
+
+Tracks progress by:
+
+Logging each step's metrics (x, y, loss) to memory
+    Saving checkpoints every 5 steps as artifacts with loss metrics
+    Saving final parameters and full metrics as artifacts   
+    LLM-based analysis: A second agent (optimization_summary) that:
+
+Analyzes the optimization trajectory
+    Finds the best checkpoint using artifacts.best()
+    Uses an LLM to describe trends and provide recommendations
+    Saves the analysis summary as an artifact
+
+Key features demonstrated:
+    Long-running loops in @graph_fn
+    Artifact management (save, search, best)
+    Memory logging for per-step events
+    Multi-agent workflow (optimizer → analyzer)
+    LLM integration for post-hoc analysis
+
+This pattern scales to real ML training loops with complex metrics and automated analysis.
+"""
 
 from __future__ import annotations
 

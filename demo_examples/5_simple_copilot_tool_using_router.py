@@ -1,94 +1,33 @@
-# ---------------------------------------------------------
-# Example: Simple Copilot – Tool-Using Router
-# ---------------------------------------------------------
-#
-# GOAL
-# ----
-# Implement a minimal “copilot” agent that:
-#   - Talks to the user via console (channel()).
-#   - Routes each request to:
-#       * a calculator tool,
-#       * a summarizer tool (LLM),
-#       * or a direct answer mode (LLM),
-#     based on a small LLM-based classifier.
-#
-# WHAT THIS EXAMPLE SHOWS
-# -----------------------
-# - Using a single @graph_fn as a "copilot" loop.
-# - Calling small tools from that loop.
-# - Letting an LLM decide which tool to use.
-# - (Optionally) logging which tool was chosen per turn.
-#
-# DESIGN NOTES
-# ------------
-# - Tools are just plain Python/async functions:
-#     * calculate(expression: str) -> str
-#     * summarize_text(text: str, context: NodeContext) -> str
-# - The copilot:
-#     * uses `context.llm()` once to classify the query,
-#     * then calls the appropriate tool or answers directly.
-#
-# This is intentionally small and "friendly", so users can imagine:
-#     - replacing tools with their own domain-specific helpers,
-#     - extending the router with more actions,
-#     - plugging this copilot into different channels (Slack, web, etc.)
-#       without touching the core logic.
-#
-# ---------------------------------------------------------
-# ADVANCED VARIANTS (IDEAS ONLY)
-# -------------------------------
-# This example keeps everything in one @graph_fn with tools as plain functions.
-# In a more advanced copilot, you might:
-#
-# 1) Turn each action into its own graph_fn agent
-#    --------------------------------------------
-#    - Instead of plain functions, define:
-#        @graph_fn(name="calculator_agent")
-#        @graph_fn(name="summarizer_agent")
-#        @graph_fn(name="search_agent")
-#        ...
-#    - The router copilot would then:
-#        * classify the query,
-#        * call the appropriate graph_fn as a sub-agent (e.g., run(calculator_agent, ...)),
-#        * integrate its result into the final reply.
-#    - Each specialist agent can have its own:
-#        * prompts,
-#        * services (RAG, job_manager, etc.),
-#        * memory/artifacts.
-#
-# 2) Use memory and artifacts to steer routing
-#    -----------------------------------------
-#    - Log each turn to memory or artifacts, e.g.:
-#        * query, chosen mode, tool outputs, error flags.
-#    - On the next request, the router can:
-#        * look at recent history (e.g., “user is in a math-heavy session, bias toward calculator”),
-#        * avoid repeating the same explanation (check prior summaries),
-#        * detect stuck loops (e.g., tool failures) and switch strategy.
-#    - This makes the copilot feel more “session-aware” and persistent over time.
-#
-# 3) Multi-step tool sequences instead of single-step calls
-#    ------------------------------------------------------
-#    - For complex tasks, the router can:
-#        * first call a “planner” graph_fn to break a request into sub-tasks,
-#        * then call multiple specialist agents in sequence (calc → summarize → explain),
-#        * finally compose a single response for the user.
-#    - All of these steps can be separate graph_fns wired together with normal Python control flow.
-#
-# 4) Channel-agnostic copilot
-#    ------------------------
-#    - The same copilot loop can run over:
-#        * console (this example),
-#        * Slack / Discord,
-#        * a web UI,
-#        * or an API endpoint,
-#      by changing only the channel adapter / config, not the core logic.
-#
-# These patterns are the same core idea:
-#   - keep the copilot loop as a small router/brain,
-#   - move specialized behavior into separate graphs + services,
-#   - let memory/artifacts provide long-term context and introspection.
-# ---------------------------------------------------------
+"""
+This script demonstrates a simple AI copilot with LLM-based tool routing:
 
+What it does:
+
+Interactive conversation loop where the copilot:
+
+Greets the user
+    Reads user queries via channel().ask_text()
+    Routes each query to the appropriate handler
+    Responds until user types 'quit'/'exit'
+
+LLM-based classifier that routes queries to three modes:
+    Calculator - Evaluates math expressions (e.g., "2+3", "(10-3)*4")
+    Summarize - Uses LLM to summarize text in 2-3 sentences
+    Direct answer - Uses LLM for general questions/conversation
+
+Tool execution:
+    Extracts expressions for calculator mode
+    Calls appropriate tool/LLM based on classification
+    Logs routing decisions to memory for tracking
+
+Key features:
+    Single agent as router: One @graph_fn coordinates everything
+    Plain functions as tools: Simple, testable tool implementations
+    LLM-driven routing: Intelligent classification without hardcoded rules
+    Channel-agnostic: Works with console, Slack, web UI, etc.
+
+    This pattern shows how to build a lightweight copilot that intelligently delegates tasks to specialized tools while maintaining a conversational interface.
+"""
 
 from __future__ import annotations
 

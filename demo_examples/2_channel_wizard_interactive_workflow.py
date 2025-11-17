@@ -1,3 +1,27 @@
+# Prerequisite: None
+
+"""
+This script implements an interactive experiment configuration wizard that:
+
+Collects user inputs through a 3-step conversational flow:
+
+Step 1: Project name and number of steps (with validation)
+Step 2: Optional advanced settings (learning rate, debug logging)
+Step 3: Confirmation with options to confirm, restart, or cancel
+Validates all inputs (non-empty strings, positive integers/floats)
+
+Saves the configuration as both a local JSON file and a persistent artifact with searchable metadata
+
+Demonstrates AetherGraph's channel API:
+
+send_text() - Display messages
+ask_text() - Get user input
+ask_approval() - Present multiple-choice buttons
+The wizard allows users to restart from the beginning or cancel at any point, making it a complete
+example of building interactive, conversational workflows with validation and state persistence.
+
+"""
+
 from __future__ import annotations
 
 import json
@@ -7,32 +31,6 @@ from typing import Any, Dict
 
 from aethergraph import graph_fn, NodeContext
 
-
-# ---------------------------------------------------------
-# Example: Channel Wizard – interactive experiment setup
-# ---------------------------------------------------------
-#
-# GOAL
-# ----
-# Demonstrate a “wizard-style” interactive flow using:
-#   - channel().send_text(...)
-#   - channel().ask_text(...)
-#   - channel().ask_approval(...)
-# and save the resulting config as an artifact.
-#
-# KEY POINT ABOUT ask_approval(...)
-# ----------------------------------
-#   result = await chan.ask_approval("...", options=["A", "B"])
-#
-# Returns a dict:
-#   {
-#     "approved": bool,   # True if the first option is chosen, or a positive choice
-#     "choice":   str     # the exact button label the user clicked, e.g. "A"
-#   }
-#
-# In this example we mostly switch on `choice`, since we define
-# explicit options like ["Yes", "No"] or ["Confirm", "Restart", "Cancel"].
-# ---------------------------------------------------------
 
 
 @dataclass

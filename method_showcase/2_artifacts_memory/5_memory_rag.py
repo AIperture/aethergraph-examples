@@ -1,20 +1,13 @@
-"""
-Prerequisite: make sure you have at least llm set up in your Aethergraph .env. 
-with the fields:
-
-AETHERGRAPH_LLM__ENABLED=true
-AETHERGRAPH_LLM__DEFAULT__PROVIDER=openai   # e.g., openai, anthropic, google, lmstudio, etc.
-AETHERGRAPH_LLM__DEFAULT__MODEL=            # e.g., gpt-4o-mini, claude-2, gemini-2.5-flash-lite, qwen/qwen2.5-vl-7b, etc.
-AETHERGRAPH_LLM__DEFAULT__EMBED_MODEL=      # e.g., text-embedding-3-small, text-embedding-004, etc. Optional if your use case needs embeddings.
-AETHERGRAPH_LLM__DEFAULT__API_KEY=          # your API key 
-
-and optionally 
-AETHERGRAPH_RAG__BACKEND=faiss              # e.g., faiss and sqlite, etc. (faiss needs extra dependencies)
-AETHERGRAPH_RAG__DIM=1536                   # e.g., 1536 for text embeddings
-
-If you set up faiss, make sure to pip install faiss or faiss-cpu first. Otherwise, the default sqlite backend will be used.
-
-"""
+# Prerequisite: Make sure you have LLM set up in your Aethergraph .env with the fields:
+# AETHERGRAPH_LLM__ENABLED=true
+# AETHERGRAPH_LLM__DEFAULT__PROVIDER=openai   # e.g., openai, anthropic, google, lmstudio, etc.
+# AETHERGRAPH_LLM__DEFAULT__MODEL=gpt-4o-mini # e.g., gpt-4o-mini, claude-2, gemini-2.5-flash-lite, qwen/qwen2.5-vl-7b, etc.
+# AETHERGRAPH_LLM__DEFAULT__API_KEY=          # your API key
+#
+# Also set up RAG index backend
+# AETHERGRAPH_RAG__BACKEND=sqlite            # e.g., faiss and sqlite, etc.
+# If you set up faiss, make sure to `pip install faiss` or `faiss-cpu` first. 
+# Otherwise, the default sqlite backend will be used.
 
 from aethergraph import graph_fn, NodeContext
 from aethergraph import start_server

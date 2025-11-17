@@ -1,25 +1,11 @@
+# Prerequisite: have api keys/base_urls for multiple LLM providers ready.
+# You don't need to set them in .env, as we will register clients programmatically in this example.
+
 from aethergraph import graph_fn, NodeContext
 from aethergraph import start_server 
 
 from aethergraph.runtime import register_llm_client, set_rag_llm_client 
 
-"""
-Prerequisite:
-You need to have API keys for the LLM providers you want to use (e.g., OpenAI, Anthropic, Google Gemini, LMStudio, etc.) 
-
-To use different profile, we can set up them via .env variables like below:
-
-AETHERGRAPH_LLM__MY_OPENAI__PROVIDER=openai
-AETHERGRAPH_LLM__MY_OPENAI__MODEL=gpt-4o-mini
-AETHERGRAPH_LLM__MY_OPENAI__TIMEOUT=60
-AETHERGRAPH_LLM__MY_OPENAI__API_KEY=sk-...
-AETHERGRAPH_LLM__MY_OPENAI__EMBED_MODEL=text-embedding-3-small # only needed if you use llm().embed() or rag()
-
-And then we can use them in the graph function like:
-    llm = context.llm(profile="my_openai")
-
-Alternatively, we can set up the profiles in the code like below.
-"""
 
 # First we need to start the sidecar so context/services are wired
 url = start_server(port=0)
@@ -38,7 +24,7 @@ register_llm_client(
     profile=lmstudio_profile,
     provider="lmstudio",
     model="qwen/qwen2.5-vl-7b",
-    base_url="http://localhost:1234/v1", # "v1" is required for LMStudio
+    base_url="http://localhost:1234/v1", # "v1" is required for LMStudio; this is default and can be omitted
 )
 
 anthropic_profile = "my_anthropic"

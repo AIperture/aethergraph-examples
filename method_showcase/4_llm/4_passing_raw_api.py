@@ -1,25 +1,17 @@
+# # Prerequisite: Make sure you have LLM set up in your Aethergraph .env with the fields:
+# AETHERGRAPH_LLM__ENABLED=true
+# AETHERGRAPH_LLM__DEFAULT__PROVIDER=openai   # e.g., openai, anthropic, google, lmstudio, etc.
+# AETHERGRAPH_LLM__DEFAULT__MODEL=gpt-4o-mini # this will be overridden in the example below
+# AETHERGRAPH_LLM__DEFAULT__API_KEY=          # your API key
+
+"""
+Use context.llm().raw() for direct access to provider-specific LLM APIs. 
+This lets you send custom payloads and call any endpoint, while reusing your configured base URL and authentication.
+You handle the request format and response parsing yourself—ideal for new features or nonstandard APIs.
+"""
+
 from aethergraph import graph_fn, NodeContext
-from aethergraph.runtime import register_llm_client, set_rag_llm_client
 from aethergraph import start_server
-
-from aethergraph import graph_fn, NodeContext
-
-"""
-llm.chat() and llm.embed() cover most use cases using typical OpenAI format and parse the responses, 
-but sometimes you need to go lower-level with provider-specific APIs.
-
-Use context.llm().raw() when you need full control of a provider’s HTTP endpoint—e.g., 
-trying a brand-new feature, sending multimodal blocks, or calling a nonstandard route—while still 
-reusing your configured base URL, auth headers, and retry logic. You can pass either a path 
-(joined to the client’s base_url) or a full url, plus json, params, and extra headers. 
-By default it returns r.json(); set return_response=True to get the raw httpx.Response 
-(useful for bytes/headers). This makes it ideal as an “escape hatch”: keep your normal 
-profiles and credentials, but ship exactly the payload the provider expects—no adapters, 
-no waiting on wrapper updates.
-
-You’re responsible for the exact payload shape (messages, contents, blocks, etc.) that are sent to the API. 
-Perfect for cutting-edge features or VLMs. However, you have to parse the raw response yourself.
-"""
 
 @graph_fn(name="raw_openai_responses_demo")
 async def raw_openai_responses_demo(*, context: NodeContext):

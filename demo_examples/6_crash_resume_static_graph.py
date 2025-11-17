@@ -1,11 +1,30 @@
-# demo_restart_minimal.py
-#
-# B. State & Resumption – Static Graph Demo
-#
-# Goal:
-#   Show how a static graph (via @graphify) can resume a long-running node
-#   from a checkpoint after a crash, by re-running with the SAME run_id.
-#
+# Prerequisite: None
+
+"""
+This script demonstrates crash recovery and resumption in static graphs using checkpoints:
+
+What it does:
+
+Defines a 3-node static graph (@graphify):
+    fast_ok_1 - Quick computation (x * 3)
+    resumable_2 - Long-running loop with periodic checkpoints (simulates heavy work)
+    combine_3 - Combines results from both nodes
+
+Checkpoint mechanism:
+    resumable_2 saves its state {i, acc} to ./.ckpt/<run_id>__resumable_2.json every 8 iterations
+    On restart with the same run_id, it loads the checkpoint and continues from where it left off
+
+Crash simulation (two options):
+    Set CRASH_AT=17 env var to crash at iteration 17
+    Or manually press Ctrl+C during execution
+
+Recovery demo:
+    First run: Process crashes/interrupted → checkpoints saved
+    Second run (same run_id): Resumes from checkpoint instead of starting over
+
+Key concept: By reusing the same run_id, long-running nodes can recover their state and avoid repeating expensive work after crashes—critical for production workflows with hours-long computations.
+"""
+
 # Graph structure:
 #
 #           +------------------+
@@ -31,20 +50,7 @@
 #           |   combine_3      |  (depends on both)
 #           |  (a + b) -> sum  |
 #           +------------------+
-#
-# First run:
-#   - We simulate a crash inside resumable_2 using an env var CRASH_AT
-#     or by manually interrupting with Ctrl+C.
-#   - resumable_2 periodically writes checkpoints to
-#     ./.ckpt/<run_id>__resumable_2.json.
-#
-# Second run:
-#   - We re-run with the SAME run_id.
-#   - resumable_2 loads its checkpoint and continues from the saved (i, acc),
-#     instead of starting from scratch.
-#   - The graph finishes and combine_3 computes the final sum.
-#
-# This demonstrates node-local state + resumption for static graphs.
+
 
 from __future__ import annotations
 

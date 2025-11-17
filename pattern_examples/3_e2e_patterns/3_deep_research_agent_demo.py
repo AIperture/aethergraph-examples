@@ -1,3 +1,53 @@
+# Prerequisite: general LLM setup in AetherGraph
+
+"""
+This script demonstrates a parallel multi-perspective research agent that breaks down complex questions into specialized angles and combines the results:
+
+What it does:
+
+Receives a research question (e.g., "How do diffusion models compare to GANs?")
+
+Spawns 3 parallel specialist agents (deep_research_angle), each focusing on a different perspective:
+    "High-level overview" - Big picture understanding
+    "Limitations and open problems" - Critical analysis
+    "Practical implementation tips" - Applied knowledge
+    All three run concurrently (fan-out pattern)
+
+Each specialist agent:
+    Sends progress update to channel: [angle] Starting work on: <question>
+    Calls LLM with specialized system prompt focused on their angle
+    Asks for 3-7 bullet points addressing that perspective
+    Sends completion message: [angle] Finished
+    Returns summary text
+
+Aggregator combines reports (combine_research_reports):
+    Waits for all 3 specialists to complete (fan-in pattern)
+    In test_mode: Simply concatenates the reports
+    In real mode: Uses LLM to merge reports into a coherent answer with:
+        Short high-level summary (2-3 sentences)
+        Integrated key points (bullet list)
+        Concrete next steps
+
+Sends final answer back to channel (Slack/console)
+
+Key concepts:
+    Parallel specialization: Multiple LLM calls run concurrently, each with different expertise
+    Fan-out/fan-in pattern: Distribute work → wait for all → combine results
+    Progressive updates: Real-time status messages keep user informed
+    Test mode: Can stub out LLM calls for fast demo/development
+    Channel-agnostic: Works with console, Slack, or any channel adapter
+    Max concurrency: max_concurrency=3 allows all 3 specialists to run simultaneously
+
+Benefits over single-agent approach:
+    Faster: Parallel execution vs sequential
+    More comprehensive: Each agent focuses deeply on its angle
+    Better quality: Specialized prompts > one generic prompt
+    Transparent: User sees progress from each specialist
+
+This pattern scales to many specialists (5-10+) analyzing different aspects of complex questions, making it powerful for research synthesis, multi-faceted analysis, and comprehensive Q&A systems.
+"""
+
+
 from __future__ import annotations
 
 import asyncio

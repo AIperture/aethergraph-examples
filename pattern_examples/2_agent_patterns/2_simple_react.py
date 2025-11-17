@@ -1,55 +1,38 @@
+# Prerequisite: set up LLM in your Aethergraph .env with the fields:
+
 """
-Example: ReAct Agent (Reason + Act + Observe)
+This script implements the ReAct (Reason + Act + Observe) agent pattern - an iterative loop where an LLM reasons about a problem, chooses tools to use, and observes results:
 
-This example implements a minimal ReAct-style agent on top of AetherGraph.
+What it does:
 
-High-level behavior
--------------------
+Given a question, the agent runs a loop (max 6 steps):
+    Thought: LLM reasons about the current situation
+    Action: LLM chooses a tool: Search, Calculator, or Finish
+    Action Input: Parameters for the tool (query, expression, or final answer)
+    Observation: Result from executing the tool
+    History accumulates and is fed back to the LLM
 
-Given a question:
+Two toy tools available:
+    Search: Looks up terms in a tiny in-memory knowledge base (_FAKE_WIKI)
+    Calculator: Evaluates simple math expressions using restricted eval()
 
-1. The agent maintains a history of (Thought, Action, Action Input, Observation) steps.
-2. At each step, it asks the LLM to:
-   - Think about the question and current history ("Thought").
-   - Pick an Action:
-       - "Search"     → query a tiny in-memory knowledge base.
-       - "Calculator" → evaluate a simple math expression.
-       - "Finish"     → stop and return a final answer.
-   - Provide an Action Input (e.g. search query, expression, or final answer text).
-3. If the action is a tool:
-   - The tool is executed in Python.
-   - The Observation is appended to the history.
-   - The loop continues, with the updated history sent back to the LLM.
-4. If the action is "Finish":
-   - The Action Input is treated as the final answer.
-   - The agent returns the answer and the full step history.
+Termination:
+    When LLM chooses Action: Finish, returns the answer immediately
+    If max steps reached without finish, asks LLM for a final answer based on accumulated observations
 
-This demonstrates:
+Key features:
+    LLM-driven tool selection: Model decides which tool to use at each step
+    Iterative refinement: Each tool result informs the next reasoning step
+    Full trace logging: Returns complete step history for transparency
+    Text-based parsing: Expects LLM to output structured Thought:, Action:, Action Input: format
 
-- A simple ReAct loop (Thought → Action → Observation).
-- Tool use controlled by the LLM, with Python actually executing the tools.
-- Returning a structured trace of the agent's reasoning and actions.
+Advanced Multi-agent evolution (not implemented):
+    Could replace Python tools with full @graph_fn specialist agents
+    Router agent orchestrates calls to sub-agents instead of simple functions
+    Each specialist has its own context, memory, and services
 
+This is a foundational pattern for building autonomous agents that can use tools to solve multi-step problems requiring both information retrieval and computation.
 
-Multi-agent / router extension
----------------------------------------
-
-This example uses a **single ReAct agent** that calls simple Python tools directly. A more advanced,
-“multi-agent” version could:
-
-- Treat each tool as its own `@graph_fn` agent:
-  - `@graph_fn(name="search_agent")` for richer search/RAG logic.
-  - `@graph_fn(name="calculator_agent")` for advanced math or symbolic reasoning.
-- Introduce a **Router Agent** (also a `graph_fn`) that:
-  - Runs the ReAct loop.
-  - Chooses which specialist agent to call as its Action.
-  - Invokes them by calling those other graphs (subgraphs/tools) instead of plain functions.
-
-In that design, tools become full agents with their own context, memory, artifacts, and services.
-The ReAct router is just one graph orchestrating other graphs.
-
-This file keeps the implementation minimal and single-agent, so the core ReAct pattern is easy to read
-and adapt, while still being ready to evolve into a multi-agent/router setup.
 """
 
 

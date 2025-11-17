@@ -1,8 +1,7 @@
+# Prerequisite: run 1_setup_rag_corpora.py to set up some demo corpora first.
+
 from aethergraph import graph_fn, NodeContext
 from aethergraph import start_server 
-
-# Prerequisite: ingest some corpora using rag_ingest_files and/or rag_ingest_inline from 1_ingest_files.py
-
 
 @graph_fn(name="rag_list_corpora")
 async def rag_list_corpora(*, context: NodeContext):

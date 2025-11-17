@@ -1,52 +1,41 @@
-# ---------------------------------------------------------
-# Example: B.2 Long Job Monitor with External Service
-# ---------------------------------------------------------
-#
-# GOAL
-# ----
-# Monitor long-running external jobs via a `job_manager` service and surface
-# status + errors back to the user through `channel()`.
-#
-# WHAT THIS EXAMPLE SHOWS
-# -----------------------
-# 1. A custom context service (`JobManagerService`) that:
-#      - submits jobs,
-#      - polls job status,
-#      - simulates success/failure.
-# 2. A polling loop with simple backoff using `asyncio.sleep`.
-# 3. Error reporting and human-in-the-loop decisions:
-#      - On failure, we ask the user: "Retry or abort?"
-# 4. BONUS: when a job fails, the service uses `self.ctx()` to:
-#      - save an error log as an artifact,
-#      - expose the artifact URI back to the graph,
-#      - optionally notify the user that an error report was saved.
-#
-# WHY USE A SERVICE FOR JOBS?
-# ---------------------------
-# Without a dedicated service, job orchestration logic tends to be scattered:
-#   - Each agent might know how to hit your cloud API directly.
-#   - Credentials, endpoints, and retries are duplicated everywhere.
-#
-# With a `JobManagerService`:
-#   - All external job orchestration is centralized:
-#       * submit / poll / cancel / get_logs etc.
-#   - Agents only use:
-#       * context.job_manager().submit_job(...)
-#       * context.job_manager().poll_status(...)
-#   - The underlying implementation can change:
-#       * local subprocess today,
-#       * Kubernetes / batch / cloud queue tomorrow,
-#       * different backends per environment (dev vs prod).
-#
-# BIGGER PICTURE
-# --------------
-# This example highlights a key AetherGraph pattern:
-#
-#   Agents = plain Python logic with a NodeContext.
-#   Services = integration glue (APIs, queues, RAG, observability, etc.).
-#
-# Agents stay small and composable; services can evolve independently.
-# ---------------------------------------------------------
+# Prerequisite: None 
+
+"""
+This script demonstrates monitoring long-running external jobs with error handling and human-in-the-loop retry logic:
+
+What it does:
+
+Defines JobManagerService - a custom service that simulates external job execution:
+    submit_job() - Submits a job and returns a job_id
+    poll_status() - Polls job status (pending → running → succeeded/failed)
+    reset_for_retry() - Creates a new job attempt with the same spec
+    Error artifact creation: On failure, uses self.ctx() to save error logs as artifacts
+
+long_job_monitor agent orchestrates the workflow:
+    Submits job via service
+    Polling loop with exponential backoff (1s → 2s → 4s → 8s max)
+    Sends status updates to user via channel
+    On success: Returns job results
+    On failure:
+        Shows error message + artifact URI
+        Asks user "Retry or Abort?"
+        Retry: Submits new job and continues polling
+        Abort: Exits with failure status
+
+Simulation behavior:
+    First attempt: Job runs for 4 polls, then fails
+    Retry attempt: Job succeeds
+    Demonstrates the retry workflow pattern
+
+Key concepts:
+    Centralized job orchestration: Service abstracts external job systems (Kubernetes, cloud batch, etc.)
+    Exponential backoff polling: Efficient status checking without hammering the service
+    Human-in-the-loop error recovery: User decides whether to retry or give up
+    Service-created artifacts: Services can participate in artifact/channel ecosystem via self.ctx()
+    Production pattern: Separates agent logic from infrastructure details
+
+This pattern is essential for workflows involving long-running compute jobs, batch processing, or any external system that requires monitoring and error recovery.
+"""
 
 from __future__ import annotations
 

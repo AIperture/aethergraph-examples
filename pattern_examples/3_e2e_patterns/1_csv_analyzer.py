@@ -1,3 +1,47 @@
+# Prerequisite: set up Slack channel as per instructions in
+# method_showcase/1_channels/4_channel_setup.py
+# and docs at https://aiperture.github.io/aethergraph-docs/channel-setup/introduction/
+
+"""
+This script demonstrates an end-to-end workflow for CSV file analysis via Slack using a static graph with dual-stage file uploads:
+
+What it does:
+
+Asks user to upload a CSV file via Slack using ask_files():
+    Prompts: "Please upload a CSV file with your data"
+    Accepts only CSV files
+    Graph suspends execution until user uploads the file in Slack
+    File gets stored in artifact store
+
+Extracts the first uploaded file's URI:
+    Uses pick_first_file_uri tool (needed because @graphify can't directly index lists)
+    Sends confirmation message showing the filename
+
+Analyzes the CSV file (summarize_csv tool):
+    Converts artifact URI to local file path using artifacts.to_local_path()
+    Reads the CSV and extracts:
+        - Total row count (including header)
+        - Column count
+        - First 5 column names as preview
+    Returns a formatted summary text
+
+Sends summary back to Slack:
+    Posts the analysis results to the same channel
+    Returns the summary as graph output
+
+Key concepts:
+
+    Dual-stage interaction: Graph pauses mid-execution waiting for human input (file upload)
+    File handling: Uploaded files stored in artifact system, accessible via URI
+    Static graph with async tools: @graphify composes async tools into a DAG
+    Channel-based UX: Works with Slack (or other channels) for interactive workflows    
+    Artifact URI → local path: Seamless conversion for processing uploaded files
+
+This pattern is useful for any workflow requiring file uploads from users (data analysis, document processing, image analysis, etc.) with immediate feedback via chat interfaces.
+
+NOTE: for testing, you can upload `d1_test_sample.csv` under the same directory as this script via Slack.
+"""
+
 from __future__ import annotations
 
 import csv

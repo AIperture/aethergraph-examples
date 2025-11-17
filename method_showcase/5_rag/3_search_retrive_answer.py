@@ -1,7 +1,13 @@
+# Prerequisite: ingest some corpora using rag_ingest_files and/or rag_ingest_inline from 1_ingest_files.py
+# You can run method_showcase/5_rag/1_ingest_files.py to set up a demo corpus.
+# In the meantime: make sure you have LLM set up in your Aethergraph .env with the fields:
+# AETHERGRAPH_LLM__ENABLED=true
+# AETHERGRAPH_LLM__DEFAULT__PROVIDER=openai   # e.g., openai, anthropic, google, lmstudio, etc.
+# AETHERGRAPH_LLM__DEFAULT__MODEL=gpt-4o-mini # e.g., gpt-4o-mini, claude-2, gemini-2.5-flash-lite, qwen/qwen2.5-vl-7b, etc.
+# AETHERGRAPH_LLM__DEFAULT__API_KEY=          # your API key
+
 from aethergraph import graph_fn, NodeContext
 from aethergraph import start_server 
-
-"""Prerequisite: ingest some corpora using rag_ingest_files and/or rag_ingest_inline from 1_ingest_files.py"""
 
 @graph_fn(name="rag_search_demo")
 async def rag_search_demo(

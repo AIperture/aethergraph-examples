@@ -1,48 +1,38 @@
 """
-Example: Chain-of-Thought Agent
+This script demonstrates the Chain-of-Thought (CoT) reasoning pattern where an LLM explicitly shows its step-by-step reasoning before providing a final answer:
 
-This example shows a minimal Chain-of-Thought (CoT) pattern in AetherGraph:
+What it does:
 
-1. Ask the user for a question via `channel()`.
-2. First LLM call: generate a step-by-step reasoning trace (CoT) ONLY.
-3. Optionally store that reasoning trace in memory or artifacts for debugging.
-4. Second LLM call: generate a concise final answer based on the reasoning.
-5. Send the answer (and optionally the reasoning trace) back to the user.
+Asks user for a question via channel (e.g., a math/logic problem)
 
-In practice, a **more sophisticated CoT agent** built on the same pattern might:
+First LLM call - Generate reasoning trace:
+    System prompt: "Think step-by-step, but DON'T give the final answer yet"
+    Returns the reasoning process/analysis
+    Stores the CoT trace in memory for debugging/auditing
 
-- **Hide CoT from end-users by default**
-  - Store the reasoning trace in memory / artifacts for debugging, audits, or research.
-  - Provide a “developer mode” or special flag that reveals CoT only when needed.
+Second LLM call - Generate final answer:
+    System prompt: "Based on this analysis, give a concise final answer"
+    Receives both the original question AND the reasoning trace
+    Produces the final answer based on the explicit reasoning
 
-- **Use multiple reasoning phases**
-  - Phase 1: rough brainstorming (list possibilities, assumptions, ambiguities).
-  - Phase 2: structured reasoning (step-by-step derivation, intermediate results).
-  - Phase 3: final decision + compact explanation.
-  - Each phase can be a separate LLM call with its own system prompt and constraints.
+Returns both outputs to the user:
+    Shows the reasoning trace (for transparency/debugging)
+    Shows the final answer
 
-- **Incorporate tools and checks**
-  - Call calculators, search, or domain-specific simulators to verify intermediate steps.
-  - Use extra LLM calls for self-check:
-    - “Scan the reasoning for arithmetic or logical errors.”
-    - “Verify each step against the given constraints or facts.”
-  - If a check fails, revise the reasoning and re-derive the answer.
+Key benefits:
+    Improved accuracy: Forcing step-by-step reasoning reduces errors on complex problems
+    Transparency: Users/developers can inspect the reasoning process
+    Debuggability: CoT traces stored in memory help identify where reasoning went wrong
+    Separation of concerns: Reasoning phase vs. answer formatting phase
 
-- **Log and analyze reasoning over many runs**
-  - Write CoT traces and final answers into artifacts (e.g. JSONL).
-  - Use another AG graph to:
-    - Cluster common failure modes.
-    - Summarize how the model typically solves certain classes of problems.
-    - Build dashboards for CoT quality/consistency.
+Advanced patterns (not implemented here):
+    Hide CoT from users by default (store only in artifacts)
+    Multi-phase reasoning (brainstorm → reason → verify)
+    Tool integration (call calculators to verify steps)
+    Self-checking (LLM validates its own reasoning)
+    Adaptive reasoning depth (skip CoT for simple questions)
 
-- **Adapt depth of reasoning to difficulty**
-  - For simple questions: skip the full CoT and answer directly.
-  - For complex multi-step questions: automatically switch into CoT mode.
-  - This can be controlled by a small classifier (another LLM call or heuristic).
-
-This file focuses on the **basic building block**:
-two LLM calls (reasoning → answer) wired through `NodeContext`,
-with an obvious place to plug in memory or artifact logging.
+This is a foundational pattern for building more reliable AI agents on complex tasks.
 """
 
 

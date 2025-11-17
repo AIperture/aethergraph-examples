@@ -1,10 +1,11 @@
+# Prerequisite: None
+
 """KV is global across all graph nodes within the same session/process."""
 
 from aethergraph import graph_fn, NodeContext
 from aethergraph import start_server 
 
-
-KV_KEY = "demo:greeting" 
+KV_KEY = "demo:greeting"
 
 @graph_fn(name="kv.writer_usage")
 async def kv_writer_usage(*, context: NodeContext):

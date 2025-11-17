@@ -1,7 +1,7 @@
+# Prerequisite: None
+
 from aethergraph import graph_fn, NodeContext, tool, graphify 
-from aethergraph.core.runtime.runtime_services import set_default_channel
-from aethergraph.core.tools.builtins.toolset import wait_text
-from aethergraph.tools import send_text, ask_text 
+from aethergraph.tools import  ask_text 
 
 # in graph_fn
 @graph_fn(name="channel_ask_text_demo")

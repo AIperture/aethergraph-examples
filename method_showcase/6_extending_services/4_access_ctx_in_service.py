@@ -1,3 +1,35 @@
+# Prerequisite: general Aethergraph setup with LLM
+
+"""
+This script demonstrates how custom services can access the full NodeContext to use other AetherGraph services (LLM, artifacts, memory, channel, logger):
+
+What it does:
+
+Defines ExperimentTracker service that orchestrates multiple AetherGraph services:
+    Uses self.ctx() to access the bound NodeContext
+    Coordinates artifacts, memory, LLM, channel, and logger in a single workflow
+
+The record_result() method performs a complete experiment tracking workflow:
+    Artifacts: Saves detailed results as JSON (artifacts.save_json())
+    LLM: Optionally summarizes long notes into 3 bullet points and saves as text
+    Logger: Logs a structured event with metadata
+    Memory: Records a compact searchable event with metrics and tags
+    Channel: Conditionally notifies user when key metric exceeds threshold (e.g., score ≥ 0.90)
+
+Demo agent (optimize_and_record) that:
+    Simulates an optimization run with metrics (score, loss, time)
+    Calls the tracker to persist results with notes
+    Gets automatic LLM summarization and channel notification
+
+Key concepts:
+    Services accessing Context: Custom services can call self.ctx() to use LLM, artifacts, memory, etc.
+    Service composition: Build higher-level services that orchestrate multiple lower-level services
+    Complex workflows simplified: One service method handles persistence, summarization, logging, and notifications
+    Conditional actions: Smart triggers (e.g., notify only when metrics are good)
+
+This pattern is powerful for building domain-specific APIs (experiment tracking, data pipelines, monitoring) that leverage AetherGraph's full runtime capabilities.
+"""
+
 from aethergraph import graph_fn, NodeContext, Service
 from aethergraph import start_server    
 from aethergraph.runtime import register_context_service

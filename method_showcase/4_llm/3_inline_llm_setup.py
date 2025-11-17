@@ -1,15 +1,9 @@
+# Prerequisite: have api keys/base_urls for multiple LLM providers ready.
+# You don't need to set them in .env, as we will register clients programmatically in this example.
+# Note: the llm client setup method shown in this example is ephemeral and only lasts for the duration of the graph function execution.
+
 from aethergraph import graph_fn, NodeContext
 from aethergraph import start_server 
-
-"""
-Prerequisite:
-- You have an llm provider, model, and API key you want to use (e.g., OpenAI's gpt-4o-mini).
-
-If you need to set up LLM clients inline (e.g., for testing or quick demos), you can do so directly in the context.llm() call by providing the necessary parameters.
-Here's an example of how to set up an OpenAI LLM client inline within a graph function.
-
-Note: this llm client setup is ephemeral and only lasts for the duration of the graph function execution.
-"""
 
 @graph_fn(name="inline_llm_setup_demo")
 async def inline_llm_setup_demo(*, context: NodeContext):

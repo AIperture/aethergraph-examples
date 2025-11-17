@@ -1,69 +1,55 @@
 """
-Example: RL Agent – `graph_fn` as Policy
+This script demonstrates using a @graph_fn as a Reinforcement Learning (RL) policy - showing how to integrate AetherGraph agents into external control loops:
 
-This example shows how to use an AetherGraph `@graph_fn` as a **policy**
-inside an external RL loop.
+What it does:
 
-High-level behavior
--------------------
+Defines a toy RL environment (GridWorld1D):
 
-- We define a tiny 1D gridworld environment in plain Python:
-  - Positions: 0, 1, 2, 3, 4
-  - Start at 0, goal at 4
-  - Actions: "left" or "right"
-  - Reward: -1 per step, +10 on reaching the goal, episode ends at goal or max steps.
+1D gridworld with positions 0-4
+    Start at 0, goal at 4
+    Actions: "left" or "right"
+    Rewards: -1 per step, +10 at goal
+    Episode ends at goal or after 20 steps
 
-- We define a policy `@graph_fn`:
-  - Input: observation (current position).
-  - Output: action ("left" or "right").
-  - For demo:
-    - The default logic is a simple heuristic (move toward the goal).
-    - The comments show how you could swap in an LLM-based policy using `context.llm()`.
+Implements policy as a @graph_fn (gridworld_policy):
+    Input: Current position (observation)
+    Output: Action ("left" or "right")
+    Uses simple heuristic: if position < goal, move right; else move left
+    Could easily swap to LLM-based policy (code commented out):
 
-- We run an **outer loop** (regular Python) for one episode:
-  - At each step:
-    - Call `run(policy_graph, inputs={"observation": obs})` to get an action.
-    - Apply the action in the environment.
-    - Get (next_obs, reward, done) and log the transition.
-  - At the end, we show the total reward and trajectory.
+Outer RL loop (standard Python, not AG):
+    Resets environment
+    Loop:
+        Calls run(gridworld_policy, inputs={"observation": obs}) to get action
+        Executes action in environment
+        Gets (next_obs, reward, done)
+        Logs transition
+    Returns total reward and trajectory
 
-What this demonstrates
-----------------------
+Optional trajectory logger (log_trajectory):
+    Shows where you'd save trajectories to artifacts/memory
+    Could trigger analysis graphs for multi-run evaluation
 
-- **Integrating AG graphs into external control loops**:
-  - The environment is "just Python", but the policy is a first-class graph/agent.
-  - You can swap in a different policy graph without touching the RL loop.
+Key benefits of using AetherGraph for RL policies:
 
-- **Using `graph_fn` as a policy: observation → action**:
-  - The policy has access to `NodeContext`:
-    - `context.llm()` for LLM-based decisions.
-    - `context.logger()`, `context.channel()`, `context.memory()`, `context.artifacts()` etc.
-  - That means a policy can:
-    - Do multi-step reasoning (CoT / ReAct) before picking an action.
-    - Call tools or domain simulators.
-    - Log internal traces to memory/artifacts.
+Policy has full NodeContext access:
+    Can use LLM for reasoning (context.llm())
+    Can call tools/simulators before choosing action
+    Can log to memory/artifacts for analysis
+    Can do multi-step reasoning (CoT/ReAct)
 
-- **Trajectory logging and analysis (hook points)**:
-  - In this simple example we log transitions in a Python list.
-  - A real setup could:
-    - Call another `@graph_fn` that writes trajectories to `artifacts` or `memory`.
-    - Use AG graphs to analyze trajectories across many runs (e.g., summarization, clustering).
+Easy evolution:
+    Start with simple heuristic (as shown)
+    Swap to LLM-based policy without changing RL loop
+    Add memory/RAG for experience replay
+    Use multi-agent coordination
 
-Why AetherGraph helps here
---------------------------
+Integration flexibility:
+    Environment stays "just Python"
+    Policy becomes a composable graph node
+    Can embed into larger orchestrations (hyperparameter sweeps, evaluation jobs)
 
-Compared to a "just Python" RL script:
-
-- The policy function is now a **graph node** with context:
-  - You can embed it inside larger orchestrations (evaluation jobs, hyperparameter sweeps, etc.).
-  - You get consistent logging, LLM services, channels, and external services (prompt store, job manager).
-
-- You can easily evolve from:
-  - A deterministic one-step policy (as in this file),
-  - To a **multi-step, tool-using, memory-aware policy** (CoT, ReAct, RAG) *without changing* the outer RL loop.
-
-This file focuses on the minimal pattern: "AG graph as policy" in a small toy env,
-with clear extension points for more complex agents.
+This pattern shows how to use AetherGraph agents in traditional RL/control scenarios while gaining access to LLMs, tools, memory, and all AG services.
 """
 
 from __future__ import annotations

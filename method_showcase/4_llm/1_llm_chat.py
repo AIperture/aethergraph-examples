@@ -1,18 +1,11 @@
+# Prerequisite: Make sure you have LLM set up in your Aethergraph .env with the fields:
+# AETHERGRAPH_LLM__ENABLED=true
+# AETHERGRAPH_LLM__DEFAULT__PROVIDER=openai   # e.g., openai, anthropic, google, lmstudio, etc.
+# AETHERGRAPH_LLM__DEFAULT__MODEL=gpt-4o-mini # e.g., gpt-4o-mini, claude-2, gemini-2.5-flash-lite, qwen/qwen2.5-vl-7b, etc.
+# AETHERGRAPH_LLM__DEFAULT__API_KEY=          # your API key
+
 from aethergraph import graph_fn, NodeContext
 from aethergraph import start_server
-from aethergraph.core.runtime.graph_runner import run_async 
-
-"""
-When no LLM profile is specified, context.llm() uses the "default" profile.
-To set up the default profile you can set up the variables in .env file with the following format:
-
-AETHERGRAPH_LLM__DEFAULT__PROVIDER=openai
-AETHERGRAPH_LLM__DEFAULT__MODEL=gpt-4o-mini
-AETHERGRAPH_LLM__DEFAULT__TIMEOUT=60
-AETHERGRAPH_LLM__DEFAULT__API_KEY=sk-...
-AETHERGRAPH_LLM__DEFAULT__EMBED_MODEL=text-embedding-3-small # only needed if you use llm().embed() or rag()
-
-"""
 
 @graph_fn(name="llm.chat.basic")
 async def llm_chat_basic(*, context: NodeContext):

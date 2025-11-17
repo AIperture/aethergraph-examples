@@ -1,3 +1,30 @@
+# Prerequisite: none
+
+"""
+This script demonstrates creating a custom service with shared mutable state (a materials database):
+
+What it does:
+
+Defines a custom Materials service that:
+    Stores refractive index data: {material_name: {wavelength: refractive_index}}
+    Provides sync reads via get_n() - fast, lock-free access (eventual consistency)
+    Provides async writes via add_sample() - mutex-protected for thread safety
+    Registers the service globally so agents can access it via context.materials()
+
+Demo agent (materials_demo) that:
+    Reads BK7 glass refractive index at 550nm wavelength    
+    Adds a new data point for 600nm
+    Sends the result to the channel
+
+Key concepts:
+    Custom services extend AetherGraph runtime with domain-specific capabilities
+    Shared mutable state across multiple agents/graph runs
+    Hybrid sync/async API: Fast reads without locks, safe writes with mutex protection
+    Service registration: Makes context.materials() available to all agents
+
+This pattern is useful for shared databases, caches, or any stateful resource that multiple agents need to access.
+"""
+
 from aethergraph import graph_fn, NodeContext, Service  
 from aethergraph import start_server
 from aethergraph.runtime import register_context_service   

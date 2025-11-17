@@ -1,9 +1,48 @@
-"""
-Prerequisite: set up a Slack or Telegram channel
-See 3_channel_setup.py and Docs for channel setup instructions.
-NOTE: Console channel does not support interruption & resume yet.
-"""
+# Prerequisite: Interactive channel setup (e.g., Slack, Telegram)
+# See: https://aiperture.github.io/aethergraph-docs/channel-setup/introduction/ for channel setup instructions.
+# See 4_channel_setup.py for example of channel setup with multiple channels and aliases.
+# NOTE: console channel does NOT support WAITING_HUMAN state resumption; use Slack/Telegram for testing.
 
+
+"""
+This script demonstrates state persistence and resumption for long-running workflows with human-in-the-loop interactions:
+
+What it does:
+
+Creates a static graph (hello_resume) that:
+    Sends a greeting message via channel (Slack/Telegram)
+    Asks for the user's name (ask_text()) → enters WAITING_HUMAN state
+    Formats a personalized message
+    Sends the final message
+
+State persistence mechanism:
+    Each node has a stable _id (e.g., "ask_text_6") for resumption
+    When waiting for user input, the graph state is saved with the same run_id
+    The process can be interrupted (Ctrl+C) while waiting
+
+Two-phase execution pattern:
+    First run (fresh run_id):
+        Graph starts, sends greeting, asks for name
+        Interrupt with Ctrl+C before answering
+        State snapshot saved to disk with WAITING_HUMAN continuation
+    Second run (same run_id):
+        Graph cold-resumes from saved state
+        User provides the answer in Slack/Telegram
+        Graph completes and returns final message
+
+Run ID management:
+    Can pass via CLI arg, env var RUN_ID, or auto-generate new one
+    Same run_id = resume; different run_id = fresh start
+
+Key concepts:
+    Durable execution: Workflows survive process crashes/restarts
+    WAITING_HUMAN state: Graph pauses awaiting external input
+    Cold resumption: Restart the process days later and continue where it left off
+    Real channel required: Console doesn't support this pattern; needs Slack/Telegram/etc.
+
+This pattern is crucial for long-running approval workflows, multi-day human-AI collaboration, or any scenario where the process might be interrupted while waiting for external events.
+
+"""
 from __future__ import annotations
 import os, sys, time, asyncio
 from aethergraph import graphify, tool

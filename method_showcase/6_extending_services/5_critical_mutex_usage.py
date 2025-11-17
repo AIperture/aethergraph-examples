@@ -1,3 +1,36 @@
+# Prerequisite: None 
+
+"""
+This script demonstrates thread-safe concurrent access to shared mutable state using the critical() decorator (mutex protection):
+
+What it does:
+
+Defines CounterService with shared mutable state:
+    Maintains an internal counter _value
+    Wraps the incr() method with self.critical() to make it thread-safe
+    The critical() decorator ensures the entire method runs under the service's built-in mutex (self._lock)
+
+The incr() method:
+    Increments the counter by n
+    Has an await asyncio.sleep(0) to simulate async operations that could cause race conditions
+    Returns the updated value
+
+Demo agent (counter_demo) that:
+    Spawns 10 concurrent workers
+    Each worker calls incr(1) 100 times
+    Expected final value: 1000 (10 workers × 100 increments)
+    Without the mutex, race conditions would cause lost updates
+
+Key concepts:
+    critical() decorator: Automatically wraps methods with mutex protection
+    Race condition prevention: Multiple concurrent agents can safely modify shared state
+    Service-wide mutex: self._lock is inherited from the Service base class
+    Proof of correctness: Final value should always be exactly 1000, not some random lower number
+
+This pattern is essential when multiple concurrent graph executions need to safely read/write shared state (counters, caches, queues, etc.).
+"""
+
+
 from aethergraph import graph_fn, NodeContext, Service
 from aethergraph import start_server
 from aethergraph.runtime import register_context_service

@@ -1,19 +1,24 @@
-# NOTE: About Memory + Events
-# ---------------------------
-# MemoryFacade stores "events" (Event dataclass instances) in a hot log + persistence.
-# Each Event has fields like:
-#   - kind      : high-level category (e.g. "chat_turn", "optimization_step")
-#   - text      : human-readable payload (string)
-#   - metrics   : optional numeric map
-#   - tags, stage, severity, etc.
-#
-# MemoryFacade.record(kind=..., data=...) stringifies `data` as JSON and writes it
-# into Event.text. That’s why, when we reload from memory, we:
-#   - read evt.text (a JSON string),
-#   - call json.loads(evt.text) to recover the original {role, text} dict.
-#
-# If you only care about raw text, you can store a plain string in `data` and skip
-# json.loads on read.
+# Prerequisite: Make sure you have LLM set up in your Aethergraph .env with the fields:
+# AETHERGRAPH_LLM__ENABLED=true
+# AETHERGRAPH_LLM__DEFAULT__PROVIDER=openai   # e.g., openai, anthropic, google, lmstudio, etc.
+# AETHERGRAPH_LLM__DEFAULT__MODEL=gpt-4o-mini # e.g., gpt-4o-mini, claude-2, gemini-2.5-flash-lite, qwen/qwen2.5-vl-7b, etc.
+# AETHERGRAPH_LLM__DEFAULT__API_KEY=          # your API key
+
+
+"""
+Agentic Flow: Chat Agent with Persistent Memory
+
+This script demonstrates an agentic flow using AetherGraph where a chat agent interacts with a user, 
+remembers previous conversations, and summarizes the session at the end. The flow consists of:
+
+1. Seeding the agent's memory with example chat turns to simulate prior context.
+2. Loading previous chat history from memory at startup, so the agent can reference past discussions.
+3. Running a chat loop where user and assistant turns are recorded in both memory and a local buffer.
+4. Using the combined history (seeded + live) to provide context-aware responses.
+5. Summarizing the conversation at session end and saving both the chat log and summary as an artifact.
+
+This enables the agent to maintain continuity across sessions and provide informed, context-rich interactions.
+"""
 
 
 from __future__ import annotations

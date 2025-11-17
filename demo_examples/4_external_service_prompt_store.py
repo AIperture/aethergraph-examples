@@ -1,63 +1,36 @@
-# ---------------------------------------------------------
-# Example: Extending Services – Prompt Store & LLM Observer
-# ---------------------------------------------------------
-#
-# GOAL
-# ----
-# Show how to define external runtime services and use them from agents via:
-#
-#   - context.prompt_store()
-#   - context.llm_observer()
-#
-# so that:
-#
-# - Prompts are managed centrally (versioned, reusable).
-# - LLM calls are logged centrally (for debugging, analytics, compliance).
-# - Agent code stays small and focused on business logic.
-#
-# WHY A PROMPT STORE?
-# -------------------
-# Without a prompt store, each agent typically hard-codes its prompts:
-#
-#   - Harder to keep multiple agents consistent.
-#   - Harder to A/B test prompt versions.
-#   - Harder to audit or update prompts without touching code.
-#
-# With a PromptStoreService:
-#
-#   - Prompts are registered once (in setup / config code).
-#   - Agents just say: template = context.prompt_store().get_prompt("support_agent").
-#   - You can later load prompts from:
-#       * a JSON/YAML file,
-#       * a database,
-#       * a remote config service,
-#       * a UI that non-engineers can edit.
-#
-# WHY AN LLM OBSERVER?
-# --------------------
-# LLMObserverService centralizes logging of:
-#
-#   - Which agent called the LLM,
-#   - Which prompt was used,
-#   - What the model responded with,
-#   - Any tags (experiment IDs, user IDs, etc.).
-#
-# That enables:
-#
-#   - Debugging: inspect prompts/responses for a specific run.
-#   - Analytics: measure usage, latency, token counts, etc.
-#   - Safety/compliance: audit what the model actually said.
-#
-# BIG PICTURE
-# -----------
-# Agents only know:
-#
-#   template = context.prompt_store().get_prompt("some_agent")
-#   context.llm_observer().record(...)
-#
-# The actual storage / logging implementation can change later
-# without modifying the agents.
-# ---------------------------------------------------------
+# Prerequisite: Make sure you have LLM set up in your Aethergraph .env with the fields:
+# AETHERGRAPH_LLM__ENABLED=true
+# AETHERGRAPH_LLM__DEFAULT__PROVIDER=openai   # e.g., openai, anthropic, google, lmstudio, etc.
+# AETHERGRAPH_LLM__DEFAULT__MODEL=gpt-4o-mini # e.g., gpt-4o-mini, claude-2, gemini-2.5-flash-lite, qwen/qwen2.5-vl-7b, etc.          
+# AETHERGRAPH_LLM__DEFAULT__API_KEY=          # your API key
+
+
+"""
+This script demonstrates custom runtime services for centralized prompt management and LLM call logging:
+
+What it does:
+
+Defines two custom services:
+    PromptStoreService - Centralized, versioned prompt storage with templates that can be updated without changing agent code
+    LLMObserverService - Logs all LLM calls with metadata (agent name, prompts, responses, tags) for debugging/analytics/compliance
+
+Two example agents that consume these services:
+    support_agent - Fetches a support template, answers user questions
+    analysis_agent - Fetches an analysis template, analyzes text
+
+External configuration pattern:
+    Prompts are registered externally (could be from JSON/YAML/database/UI)
+    Agents just call context.prompt_store().get_prompt("agent_name")
+    All LLM calls are automatically logged via context.llm_observer().record()
+
+Key benefits:
+    Separation of concerns: Prompts live outside code
+    Versioning: A/B test different prompt versions
+    Centralized logging: Track all LLM interactions in one place
+    Flexibility: Swap storage/logging implementations without changing agents
+
+This pattern enables non-engineers to update prompts and provides centralized observability for LLM usage.
+"""
 
 from __future__ import annotations
 

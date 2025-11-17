@@ -1,3 +1,33 @@
+# Prerequisite: None 
+
+"""
+This script demonstrates manual concurrency control in @graph_fn agents using asyncio primitives:
+
+What it does:
+
+Creates a semaphore (asyncio.Semaphore(4)) to limit concurrent tasks to 4 at a time
+
+Defines run_capped() helper that wraps any async function with semaphore protection
+
+batch_agent processes items in parallel:
+    Takes a list of items (7 fruits in the demo)
+    Spawns concurrent tasks for each item (uppercase conversion)
+    Semaphore ensures max 4 run simultaneously (even though 7 are submitted)
+    Uses asyncio.gather() to wait for all tasks to complete
+    Returns all uppercase results
+
+Execution flow:
+    Input: ["apple", "banana", "cherry", "date", "elderberry", "fig", "grape"]
+    4 tasks run at once, then next 3 run as slots free up
+    Output: {"ys": ["APPLE", "BANANA", "CHERRY", "DATE", "ELDERBERRY", "FIG", "GRAPE"]}
+
+Key concepts:
+    Manual concurrency control in dynamic @graph_fn agents using standard asyncio tools
+    Rate limiting to avoid overwhelming external resources (APIs, databases, etc.)
+    Combines AetherGraph context services (channel) with native Python async patterns
+"""
+
+
 import asyncio
 from aethergraph import graph_fn
 

@@ -1,7 +1,45 @@
-"""Prerequisite: any channel method with interactivity support (e.g., ask_text, ask_approval, wait_text).
-See 3_channel_setup.py and Docs for channel setup instructions.
-"""
+# Prerequisite: Interactive channel setup (e.g., Slack, Telegram)
+# See: https://aiperture.github.io/aethergraph-docs/channel-setup/introduction/ for channel setup instructions.
+# See 4_channel_setup.py for example of channel setup with multiple channels and aliases.
 
+"""
+This script demonstrates comprehensive channel communication methods through an interactive portfolio monitoring demo:
+
+What it does:
+
+Text interaction:
+    Sends greeting message
+    Asks for stock symbol (ask_text)
+    Checks for uploaded files (get_latest_uploads)
+    Asks for buy/sell/hold decision (ask_approval)
+
+File handling:
+    Send chart image: Generates matplotlib price chart → sends as PNG via send_file()
+    Send data export: Creates CSV file → zips it → sends ZIP via send_file()
+
+Link buttons (send_buttons):
+    Sends clickable buttons for "Download Data" and "View Dashboard"
+    Uses Button class for interactive links
+
+Streaming output (stream()):
+    Live-updates a report with 15 lines
+    Shows real-time progress (e.g., "update 1/15: pnl=-0.43%")
+    Uses delta() for incremental updates, end() for completion
+
+Key features demonstrated:
+
+send_text() - Send messages
+ask_text() - Get text input
+ask_approval() - Multiple-choice buttons
+send_file() - Send images/files
+send_buttons() - Interactive link buttons
+stream() - Live streaming updates
+get_latest_uploads() - Retrieve uploaded files
+
+This is a comprehensive walkthrough of all major channel methods in one interactive workflow.
+
+NOTE: Accepting file uploads via ask_files() is commented out to avoid user confusion. Uncomment to enable explicit file upload requests.
+"""
 from aethergraph import graph_fn, NodeContext, tool
 from aethergraph import start_server
 
@@ -107,20 +145,20 @@ async def portfolio_channel_demo(*, context: NodeContext):
     if uploads:
         await chan.send_text(f"Received your uploaded file: {uploads[0]['filename']}") 
 
-    # Ask for uploads directly 
-    uploads_2 = await chan.ask_files(
-        prompt=f"Please upload any relevant files for *{sym}* (e.g., transaction history).",
-        accept=[".csv", ".xlsx"], # this only informs the frontend file picker, not enforced in AetherGraph backend
-        multiple=False, # this only informs the frontend file picker, not enforced in AetherGraph backend
-        timeout_s=600
-     )
+    # Uncomment the following to enable ask for uploads explicitly -- disable for now as use might be confusing of what to upload
+    # uploads_2 = await chan.ask_files(
+    #     prompt=f"Please upload any relevant files for *{sym}* (e.g., transaction history).",
+    #     accept=[".csv", ".xlsx"], # this only informs the frontend file picker, not enforced in AetherGraph backend
+    #     multiple=False, # this only informs the frontend file picker, not enforced in AetherGraph backend
+    #     timeout_s=600
+    #  )
     
-    if uploads_2.get("files"):
-        print(uploads_2)
-        file_uri = uploads_2["files"][0].get("uri","")
-        await chan.send_text(f"Received your uploaded files and stored at: {file_uri}")
-    else:
-        await chan.send_text(f"No files were uploaded.")
+    # if uploads_2.get("files"):
+    #     print(uploads_2)
+    #     file_uri = uploads_2["files"][0].get("uri","")
+    #     await chan.send_text(f"Received your uploaded files and stored at: {file_uri}")
+    # else:
+    #     await chan.send_text(f"No files were uploaded.")
 
     # Ask for actions 
     decision = (await chan.ask_approval(

@@ -1,3 +1,7 @@
+# Prerequisite: None
+# Suggested: slack channel or telegram channel for better interactivity
+# See: https://aiperture.github.io/aethergraph-docs/channel-setup/introduction/ for channel setup instructions.
+
 from aethergraph import graph_fn, graphify, tool, NodeContext 
 from aethergraph.tools import send_text, ask_approval 
 

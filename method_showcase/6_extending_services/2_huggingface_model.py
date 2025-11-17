@@ -1,4 +1,34 @@
-"""Prerequisite: pip install transformers"""
+# Prerequisite: Make sure you have transformers library installed (pip install transformers)
+
+"""
+This script demonstrates integrating HuggingFace models as a custom service with lazy loading and thread-safe execution:
+
+What it does:
+
+Defines HFText service that wraps HuggingFace transformers:
+    Lazy initialization: Model loads only when first needed (via _ensure_loaded())
+    Fallback mode: If transformers isn't installed, uses a stub implementation
+    Thread-safe blocking calls: Uses run_blocking() to run CPU-heavy model operations without blocking the async event loop
+
+Provides analyze() method for sentiment analysis:
+    Takes a list of text strings
+    Returns sentiment labels (POSITIVE/NEGATIVE) with confidence scores
+    Runs model inference in a thread pool
+
+Demo agent (hf_text_demo) that:
+    Analyzes 3 sample texts
+    Sends results to the channel (shows input + sentiment output)
+    Returns all outputs
+
+Key concepts:
+    Heavy ML models as services: Share expensive models across multiple agents
+    Lazy loading: Defer initialization until first use
+    run_blocking(): Execute CPU-bound/synchronous code without blocking async agents
+    Graceful degradation: Fallback stub when dependencies aren't available
+
+This pattern is useful for integrating any CPU-intensive or synchronous library (ML models, image processing, scientific computing) into AetherGraph's async runtime.
+
+"""
 
 from aethergraph import graph_fn, NodeContext, Service 
 from aethergraph import start_server

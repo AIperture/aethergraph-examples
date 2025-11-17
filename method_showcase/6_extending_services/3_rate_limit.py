@@ -1,8 +1,33 @@
-"""
-This demo shows how to extend AetherGraph with a custom service that
-implements rate-limited API calls with retries using the token bucket algorithm.
+# Prerequisite: None
 
-Algorithm reference: https://en.wikipedia.org/wiki/Token_bucket
+"""
+This script demonstrates implementing rate-limited API calls with automatic retries using a custom service:
+
+What it does:
+
+Implements TokenBucket algorithm for rate limiting:
+    Allows burst traffic up to a limit
+    Refills tokens at a constant rate (e.g., 3 requests/second)
+    Returns wait time if tokens are depleted
+
+Defines ApiBroker service that:
+    Per-tenant, per-vendor rate limiting: Each (tenant, vendor) pair gets its own token bucket
+    Automatic rate smoothing: Delays requests when rate limit is hit
+    Exponential backoff retries: Retries failed requests up to 3 times with increasing delays
+    Simulates API calls with 20% random transient errors for demo
+
+Demo agent (api_broker_demo) that:
+    Fires 8 rapid API calls
+    Broker automatically rate-limits and retries failed requests
+    Shows results via channel
+
+Key concepts:
+    Centralized rate limiting: All agents share the same rate limit enforcement
+    Token bucket: Fair queueing algorithm that allows bursts while maintaining average rate
+    Resilience: Automatic retry logic handles transient failures
+    Multi-tenancy: Different rate limits per tenant/vendor combination
+
+This pattern is essential for production systems that need to respect API quotas and handle external service reliability issues gracefully.
 """
 
 

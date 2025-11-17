@@ -1,6 +1,6 @@
-from aethergraph import graph_fn, graphify, tool, NodeContext
-from aethergraph import start_server 
+# Prerequisite: None
 
+from aethergraph import graph_fn, graphify, tool, NodeContext
 
 # in graph_fn
 @graph_fn(name="channel_send_demo")
