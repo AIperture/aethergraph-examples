@@ -143,7 +143,7 @@ async def portfolio_channel_demo(*, context: NodeContext):
     # If user update a file with the reply:
     uploads = await chan.get_latest_uploads(clear=True)
     if uploads:
-        await chan.send_text(f"Received your uploaded file: {uploads[0]['filename']}") 
+        await chan.send_text(f"Received your uploaded file: {uploads[0]['name']}") 
 
     # Uncomment the following to enable ask for uploads explicitly -- disable for now as use might be confusing of what to upload
     # uploads_2 = await chan.ask_files(
