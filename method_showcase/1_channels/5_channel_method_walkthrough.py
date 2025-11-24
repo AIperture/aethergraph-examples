@@ -143,7 +143,7 @@ async def portfolio_channel_demo(*, context: NodeContext):
     # If user update a file with the reply:
     uploads = await chan.get_latest_uploads(clear=True)
     if uploads:
-        await chan.send_text(f"Received your uploaded file: {uploads[0]['name']}") 
+        await chan.send_text(f"Received {len(uploads['files'])} uploaded files. Processing... (simulated)") 
 
     # Uncomment the following to enable ask for uploads explicitly -- disable for now as use might be confusing of what to upload
     # uploads_2 = await chan.ask_files(
@@ -163,12 +163,12 @@ async def portfolio_channel_demo(*, context: NodeContext):
     # Ask for actions 
     decision = (await chan.ask_approval(
         prompt=f"Do you want to buy, sell, or hold *{sym}*?", 
-        options=["Buy", "Sell", "Hold"], timeout_s=600)).get("choice","Hold") 
+        options=["Buy", "Sell", "Hold"], timeout_s=600)).get("choice","hold") 
     
     # Simulate action
-    if decision == "Buy":
+    if decision == "Buy".lower():
         await chan.send_text(f"Placing a buy order for *{sym}*... (simulated)")
-    elif decision == "Sell":
+    elif decision == "Sell".lower():
         await chan.send_text(f"Placing a sell order for *{sym}*... (simulated)")
     else:
         await chan.send_text(f"Holding position on *{sym}*... (simulated)")
